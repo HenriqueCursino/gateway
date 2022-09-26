@@ -14,36 +14,62 @@ type types interface {
 func Run(db *gorm.DB) {
 	roles := []model.Roles{
 		{
-			Role: "ADM",
+			Role: "admin",
 		},
 		{
-			Role: "Commun",
+			Role: "commun",
 		},
 	}
 
 	permissions := []model.Permissions{
 		{
-			Permission: "create_user",
+			Permission: "user_create",
 		},
 		{
-			Permission: "delete_user",
+			Permission: "user_delete",
 		},
 		{
-			Permission: "update_user_permission",
+			Permission: "user_update",
 		},
 		{
-			Permission: "check_user_permission",
+			Permission: "user_read",
 		},
 		{
-			Permission: "delete_user",
+			Permission: "permission_create",
 		},
 		{
-			Permission: "delete_user_permission",
+			Permission: "permission_delete",
+		},
+		{
+			Permission: "permission_update",
+		},
+		{
+			Permission: "permission_read",
+		},
+	}
+
+	users := []model.Users{
+		{
+			FullName: "Henrique Cursino",
+			Email:    "henrique@gmail.com",
+			Cpf:      12345678910,
+			Password: "123",
+			RoleId:   1,
+			Roles:    model.Roles{},
+		},
+		{
+			FullName: "Guilherme Sembeneli",
+			Email:    "guilherme@gmail.com",
+			Cpf:      11122233344,
+			Password: "123456",
+			RoleId:   2,
+			Roles:    model.Roles{},
 		},
 	}
 
 	create(db, &roles)
 	create(db, &permissions)
+	create(db, &users)
 }
 
 func create[model types](db *gorm.DB, seeds model) {
