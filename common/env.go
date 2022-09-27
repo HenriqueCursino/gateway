@@ -7,9 +7,9 @@ import (
 var CurrentMode = GetEnviroment("CURRENT_MODE")
 
 func GetEnviroment(envName string) string {
-	var CurrentMode = os.Getenv(envName)
-	if CurrentMode == "" {
+	var valueEnv = os.Getenv(envName)
+	if valueEnv == "" {
 		panic(envName + " is empty!")
 	}
-	return CurrentMode
+	return valueEnv
 }
