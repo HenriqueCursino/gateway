@@ -17,13 +17,17 @@ func Router() {
 	router := gin.Default()
 	db := structure.ConnectDB()
 
-	if os.Getenv("CURRENT_MODE") == common.DEVELOPMENT_VALIDATE {
-		if err := migration.Run(db); err == nil && db.Migrator().HasTable(&model.Users{}) {
-			if err := db.First(&model.Users{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-				seed.Run(db)
-			}
-		}
+	if os.Getenv("CURRENT_MODE") == common.DEVELOPMENT {
+		checkNeedSeed(db)
 	}
 
 	router.Run(":8080")
+}
+
+func checkNeedSeed(db *gorm.DB) {
+	if err := migration.Run(db); err == nil && db.Migrator().HasTable(&model.Users{}) {
+		if err := db.First(&model.Users{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			seed.Run(db)
+		}
+	}
 }
