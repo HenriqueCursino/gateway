@@ -1,5 +1,15 @@
 package common
 
-import "os"
+import (
+	"os"
+)
 
-var CurrentMode = os.Getenv("CURRENT_MODE")
+var CurrentMode = GetEnviroment("CURRENT_MODE")
+
+func GetEnviroment(envName string) string {
+	var CurrentMode = os.Getenv(envName)
+	if CurrentMode == "" {
+		panic(envName + " is empty!")
+	}
+	return CurrentMode
+}
