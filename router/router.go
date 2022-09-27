@@ -2,14 +2,13 @@ package router
 
 import (
 	"errors"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/henriquecursino/gateway/common"
+	structure "github.com/henriquecursino/gateway/database"
 	"github.com/henriquecursino/gateway/database/migration"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/database/seed"
-	"github.com/henriquecursino/gateway/structure"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +16,7 @@ func Router() {
 	router := gin.Default()
 	db := structure.ConnectDB()
 
-	if os.Getenv("CURRENT_MODE") == common.DEVELOPMENT {
+	if common.CurrentMode == common.DEVELOPMENT {
 		checkNeedSeed(db)
 	}
 
@@ -25,9 +24,16 @@ func Router() {
 }
 
 func checkNeedSeed(db *gorm.DB) {
-	if err := migration.Run(db); err == nil && db.Migrator().HasTable(&model.Users{}) {
+	if existTableUsers(db) {
 		if err := db.First(&model.Users{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			seed.Run(db)
 		}
 	}
+}
+
+func existTableUsers(db *gorm.DB) bool {
+	err := migration.Run(db)
+	hasTable := db.Migrator().HasTable(&model.Users{})
+
+	return err == nil && hasTable
 }
