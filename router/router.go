@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/common/errors"
-	structure "github.com/henriquecursino/gateway/database"
+	dataBase "github.com/henriquecursino/gateway/database"
 	"github.com/henriquecursino/gateway/database/migration"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/database/seed"
@@ -13,8 +13,7 @@ import (
 
 func Router() {
 	router := gin.Default()
-	db := structure.ConnectDB()
-
+	db := dataBase.ConnectDB()
 	if common.CurrentMode == common.DEVELOPMENT && isNeedSeed(db) {
 		seed.Run(db)
 	}
