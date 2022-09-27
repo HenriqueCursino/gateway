@@ -1,8 +1,6 @@
 package router
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/gin"
 	"github.com/henriquecursino/gateway/common"
 	structure "github.com/henriquecursino/gateway/database"
@@ -24,10 +22,8 @@ func Router() {
 }
 
 func checkNeedSeed(db *gorm.DB) {
-	if existTableUsers(db) {
-		if err := db.First(&model.Users{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-			seed.Run(db)
-		}
+	if existTableUsers(db) && tableUsersIsEmpty(db) {
+		seed.Run(db)
 	}
 }
 
@@ -36,4 +32,10 @@ func existTableUsers(db *gorm.DB) bool {
 	hasTable := db.Migrator().HasTable(&model.Users{})
 
 	return err == nil && hasTable
+}
+
+func tableUsersIsEmpty(db *gorm.DB) bool {
+	err := db.First(&model.Users{}).Error
+
+	return err == nil
 }
