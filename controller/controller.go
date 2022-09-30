@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,22 +15,27 @@ type Controller interface {
 }
 
 type controller struct {
-	serv service.Service
+	service service.Service
 }
 
-// função para receber os métodos da interface
-func NewController(serv service.Service) Controller {
+// NewController receive methods about core user
+func NewController(service service.Service) Controller {
 	return &controller{
-		serv,
+		service,
 	}
 }
 
-func (ctl controller) PostUser(c *gin.Context) {
+func (c *controller) PostUser(ctx *gin.Context) {
 	userRequest := dto.UserRequest{}
-	c.ShouldBindJSON(&userRequest)
+	errBindJSON := ctx.ShouldBindJSON(&userRequest)
+	if errBindJSON != nil {
+		log.Fatal("Failed to bind JSON! - ", errBindJSON)
+	}
 
-	err := ctl.serv.UserService(userRequest)
-	errors.IsEmptyError(err)
+	err := c.service.UserService(userRequest)
+	if !errors.IsEmptyError(err) {
+		ctx.JSON(http.StatusBadRequest, "Failed to create user!")
+	}
 
-	c.JSON(http.StatusOK, "User created successfully!")
+	ctx.JSON(http.StatusOK, "User created successfully!")
 }

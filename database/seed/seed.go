@@ -52,7 +52,7 @@ func Run(db *gorm.DB) {
 		{
 			FullName: "Henrique Cursino",
 			Email:    "henrique@gmail.com",
-			Cpf:      12345678910,
+			Document: "12345678910",
 			Password: "123",
 			RoleId:   1,
 			Roles:    model.Roles{},
@@ -60,7 +60,7 @@ func Run(db *gorm.DB) {
 		{
 			FullName: "Guilherme Sembeneli",
 			Email:    "guilherme@gmail.com",
-			Cpf:      11122233344,
+			Document: "11122233344",
 			Password: "123456",
 			RoleId:   2,
 			Roles:    model.Roles{},

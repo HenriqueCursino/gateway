@@ -1,8 +1,11 @@
 package router
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/henriquecursino/gateway/common"
+	"github.com/henriquecursino/gateway/common/env"
 	"github.com/henriquecursino/gateway/common/errors"
 	"github.com/henriquecursino/gateway/controller"
 	dataBase "github.com/henriquecursino/gateway/database"
@@ -17,7 +20,7 @@ import (
 func Router() {
 	router := gin.Default()
 	db := dataBase.ConnectDB()
-	if common.CurrentMode == common.DEVELOPMENT && isNeedSeed(db) {
+	if env.CurrentMode == common.DEVELOPMENT && isNeedSeed(db) {
 		seed.Run(db)
 	}
 
@@ -27,7 +30,7 @@ func Router() {
 
 	router.POST("/users", controller.PostUser)
 
-	router.Run(":8080")
+	router.Run(os.Getenv("SERVER_PORT"))
 }
 
 func isNeedSeed(db *gorm.DB) bool {
@@ -42,7 +45,8 @@ func existTableUsers(db *gorm.DB) bool {
 }
 
 func tableUsersIsEmpty(db *gorm.DB) bool {
-	err := db.First(&model.Users{}).Error
+	var userModel []model.Users
+	err := db.Find(&userModel)
 
-	return errors.IsEmptyError(err)
+	return err != nil && len(userModel) < common.CHECK_TABLE_EMPTY
 }

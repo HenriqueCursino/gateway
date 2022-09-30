@@ -1,17 +1,17 @@
 package dto
 
 type UserRequest struct {
-	FullName string `json:"full_name"`
-	Email    string `json:"email"`
-	Cpf      string `json:"cpf"`
-	Password string `json:"password"`
-	RoleID   int    `json:"role_id"`
+	FullName string `json:"full_name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Document string `json:"document" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	RoleID   int    `json:"role_id" binding:"required"`
 }
 
-type UserCreat struct {
-	FullName string `gorm:"size:30"`
-	Email    string `gorm:"size:30; unique" `
-	Cpf      int64  `gorm:"unique"`
-	Password string `gorm:"size:15"`
+type UserCreate struct {
+	FullName string
+	Email    string
+	Document string
+	Password string
 	RoleId   int
 }

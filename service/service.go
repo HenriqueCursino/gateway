@@ -21,12 +21,12 @@ func NewService(repo repository.Repository) Service {
 }
 
 func (serv service) UserService(userRequest dto.UserRequest) error {
-	documentInt := tools.TreatDoc(userRequest.Cpf)
+	documentUnmasked := tools.RemoveMask(userRequest.Document)
 
-	user := dto.UserCreat{
+	user := dto.UserCreate{
 		FullName: userRequest.FullName,
 		Email:    userRequest.Email,
-		Cpf:      int64(documentInt),
+		Document: documentUnmasked,
 		Password: userRequest.Password,
 		RoleId:   userRequest.RoleID,
 	}

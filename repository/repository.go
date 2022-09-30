@@ -1,12 +1,13 @@
 package repository
 
 import (
+	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	CreateUser(user *dto.UserCreat) error
+	CreateUser(user *dto.UserCreate) error
 }
 
 type repository struct {
@@ -17,8 +18,8 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
-func (repo repository) CreateUser(user *dto.UserCreat) error {
-	if err := repo.db.Table("users").Create(&user).Error; err != nil {
+func (repo *repository) CreateUser(user *dto.UserCreate) error {
+	if err := repo.db.Table(model.TableUserName).Create(&user).Error; err != nil {
 		return err
 	}
 	return nil
