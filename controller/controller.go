@@ -60,5 +60,7 @@ func (c *controller) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorToken)
 	}
 
-	ctx.JSON(http.StatusOK, token)
+	ctx.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }

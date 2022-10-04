@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository interface {
+type IRepository interface {
 	CreateUser(user *dto.UserCreate) error
 	LoginUser(login dto.UserLogin) (model.Users, error)
 }
@@ -15,7 +15,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) Repository {
+func NewRepository(db *gorm.DB) IRepository {
 	return &repository{db}
 }
 
@@ -26,7 +26,7 @@ func (repo *repository) CreateUser(user *dto.UserCreate) error {
 	return nil
 }
 
-func (repo repository) LoginUser(login dto.UserLogin) (model.Users, error) {
+func (repo *repository) LoginUser(login dto.UserLogin) (model.Users, error) {
 	user := model.Users{}
 	err := repo.db.Table(model.TableUserName).Where("email = ?", login.Email).First(&user).Error
 	return user, err

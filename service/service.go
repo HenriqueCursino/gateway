@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/google/uuid"
 	"github.com/henriquecursino/gateway/common/env"
 	"github.com/henriquecursino/gateway/dto"
 	"github.com/henriquecursino/gateway/repository"
@@ -18,21 +17,21 @@ type Service interface {
 }
 
 type service struct {
-	repo repository.Repository
+	repo repository.IRepository
 }
 
-func NewService(repo repository.Repository) Service {
+func NewService(repo repository.IRepository) Service {
 	return &service{
 		repo,
 	}
 }
 
-func (serv service) UserService(userRequest dto.UserRequest) error {
+func (serv *service) UserService(userRequest dto.UserRequest) error {
 	documentUnmasked := tools.RemoveMask(userRequest.Document)
 
 	user := dto.UserCreate{
 		FullName: userRequest.FullName,
-		Hash:     uuid.New().String(),
+		Hash:     tools.GenerateHash(),
 		Email:    userRequest.Email,
 		Document: documentUnmasked,
 		Password: userRequest.Password,
@@ -43,7 +42,7 @@ func (serv service) UserService(userRequest dto.UserRequest) error {
 	return err
 }
 
-func (serv service) LoginService(loginRequest dto.UserLogin) error {
+func (serv *service) LoginService(loginRequest dto.UserLogin) error {
 	login := dto.UserLogin{
 		Email:    loginRequest.Email,
 		Password: loginRequest.Password,
@@ -59,7 +58,7 @@ func (serv service) LoginService(loginRequest dto.UserLogin) error {
 	return nil
 }
 
-func (serv service) CreateJWT(user *dto.UserLogin) (string, error) {
+func (serv *service) CreateJWT(user *dto.UserLogin) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)

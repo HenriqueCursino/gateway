@@ -12,6 +12,7 @@ import (
 	"github.com/henriquecursino/gateway/database/migration"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/database/seed"
+	"github.com/henriquecursino/gateway/middleware"
 	"github.com/henriquecursino/gateway/repository"
 	"github.com/henriquecursino/gateway/service"
 	"gorm.io/gorm"
@@ -28,7 +29,7 @@ func Router() {
 	serv := service.NewService(repo)
 	controller := controller.NewController(serv)
 
-	router.POST("/users", controller.PostUser)
+	router.POST("/users", middleware.Validate(), controller.PostUser)
 	router.POST("/login", controller.Login)
 
 	router.Run(os.Getenv("SERVER_PORT"))
