@@ -10,8 +10,14 @@ type UserRequest struct {
 
 type UserCreate struct {
 	FullName string
+	Hash     string
 	Email    string
 	Document string
 	Password string
 	RoleId   int
+}
+
+type UserLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

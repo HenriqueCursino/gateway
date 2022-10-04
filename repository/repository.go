@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	CreateUser(user *dto.UserCreate) error
+	LoginUser(login dto.UserLogin) (model.Users, error)
 }
 
 type repository struct {
@@ -23,4 +24,10 @@ func (repo *repository) CreateUser(user *dto.UserCreate) error {
 		return err
 	}
 	return nil
+}
+
+func (repo repository) LoginUser(login dto.UserLogin) (model.Users, error) {
+	user := model.Users{}
+	err := repo.db.Table(model.TableUserName).Where("email = ?", login.Email).First(&user).Error
+	return user, err
 }

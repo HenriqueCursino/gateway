@@ -6,11 +6,13 @@ import (
 )
 
 var (
-	CurrentMode string
+	CurrentMode  string
+	SecretKeyJWT string
 )
 
 func Load() {
 	CurrentMode = GetEnviroment("CURRENT_MODE")
+	SecretKeyJWT = GetEnviroment("SECRET_KEY_JWT")
 }
 
 func GetEnviroment(envName string) string {

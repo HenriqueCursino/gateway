@@ -29,6 +29,7 @@ func Router() {
 	controller := controller.NewController(serv)
 
 	router.POST("/users", controller.PostUser)
+	router.POST("/login", controller.Login)
 
 	router.Run(os.Getenv("SERVER_PORT"))
 }
