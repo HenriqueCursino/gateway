@@ -1,11 +1,16 @@
 package model
 
+const (
+	TableUserName = "users"
+)
+
 type Users struct {
-	ID       int    `gorm:"primaryKey; autoIncrement" json:"id"`
-	FullName string `gorm:"size:30" json:"full_name"`
-	Email    string `gorm:"size:30; unique" json:"email"`
-	Cpf      int64  `gorm:"unique" json:"cpf"`
-	Password string `gorm:"size:15" json:"password"`
-	RoleId   int    `json:"id_role"`
-	Roles    Roles  `gorm:"foreignKey:RoleId"`
+	ID       int    `gorm:"primaryKey; autoIncrement" `
+	FullName string `gorm:"size:30"`
+	Hash     string `gorm:"unique"`
+	Email    string `gorm:"size:30; unique" `
+	Document string `gorm:"unique" `
+	Password string `gorm:"size:15"`
+	RoleId   int
+	Roles    Roles `gorm:"foreignKey:RoleId"`
 }

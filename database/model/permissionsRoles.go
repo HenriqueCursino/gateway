@@ -1,9 +1,9 @@
 package model
 
 type PermissionsRoles struct {
-	ID           int         `gorm:"primaryKey; autoIncrement" json:"id"`
-	RoleId       int         `json:"id_role"`
-	Roles        Roles       `gorm:"foreignKey:RoleId"`
-	PermissionId int         `json:"id_permission"`
+	ID           int `gorm:"primaryKey; autoIncrement"`
+	RoleId       int
+	Roles        Roles `gorm:"foreignKey:RoleId"`
+	PermissionId int
 	Permissions  Permissions `gorm:"foreignKey:PermissionId"`
 }

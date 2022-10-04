@@ -3,6 +3,7 @@ package seed
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/henriquecursino/gateway/database/model"
 	"gorm.io/gorm"
 )
@@ -51,16 +52,18 @@ func Run(db *gorm.DB) {
 	users := []model.Users{
 		{
 			FullName: "Henrique Cursino",
+			Hash:     uuid.New().String(),
 			Email:    "henrique@gmail.com",
-			Cpf:      12345678910,
+			Document: "12345678910",
 			Password: "123",
 			RoleId:   1,
 			Roles:    model.Roles{},
 		},
 		{
 			FullName: "Guilherme Sembeneli",
+			Hash:     uuid.New().String(),
 			Email:    "guilherme@gmail.com",
-			Cpf:      11122233344,
+			Document: "11122233344",
 			Password: "123456",
 			RoleId:   2,
 			Roles:    model.Roles{},
