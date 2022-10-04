@@ -1,7 +1,7 @@
 package common
 
 const (
-	DEVELOPMENT       = "development"
-	CHECK_TABLE_EMPTY = 1
-	HEADER_KEY        = "authorized"
+	Development     = "development"
+	CheckTableEmpty = 1
+	HeaderKey       = "authorized"
 )

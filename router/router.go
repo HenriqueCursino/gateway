@@ -21,7 +21,7 @@ import (
 func Router() {
 	router := gin.Default()
 	db := dataBase.ConnectDB()
-	if env.CurrentMode == common.DEVELOPMENT && isNeedSeed(db) {
+	if env.CurrentMode == common.Development && isNeedSeed(db) {
 		seed.Run(db)
 	}
 
@@ -50,5 +50,5 @@ func tableUsersIsEmpty(db *gorm.DB) bool {
 	var userModel []model.Users
 	err := db.Find(&userModel)
 
-	return err != nil && len(userModel) < common.CHECK_TABLE_EMPTY
+	return err != nil && len(userModel) < common.CheckTableEmpty
 }

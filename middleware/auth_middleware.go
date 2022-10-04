@@ -17,7 +17,7 @@ func Validate() gin.HandlerFunc {
 			return
 		}
 
-		token := context.Request.Header.Get(common.HEADER_KEY)
+		token := context.Request.Header.Get(common.HeaderKey)
 		if !isValidToken(token) {
 			context.AbortWithStatus(http.StatusUnauthorized)
 			return
@@ -28,7 +28,7 @@ func Validate() gin.HandlerFunc {
 }
 
 func hasTokenOnHeaders(ctx *gin.Context) bool {
-	token := ctx.Request.Header.Get(common.HEADER_KEY)
+	token := ctx.Request.Header.Get(common.HeaderKey)
 	return token != ""
 }
 

@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type IRepository interface {
+type Repository interface {
 	CreateUser(user *dto.UserCreate) error
 	LoginUser(login dto.UserLogin) (model.Users, error)
 }
@@ -15,7 +15,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) IRepository {
+func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
