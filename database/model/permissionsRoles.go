@@ -1,5 +1,9 @@
 package model
 
+const (
+	TablePermissionRole = "permissions_roles"
+)
+
 type PermissionsRoles struct {
 	ID           int `gorm:"primaryKey; autoIncrement"`
 	RoleId       int

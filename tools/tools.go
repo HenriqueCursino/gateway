@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/google/uuid"
@@ -13,4 +14,8 @@ func RemoveMask(document string) string {
 
 func GenerateHash() string {
 	return uuid.New().String()
+}
+
+func GetStringFromBody(body interface{}) string {
+	return fmt.Sprintf("%v", body)
 }

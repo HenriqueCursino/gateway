@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -41,4 +42,25 @@ func isValidToken(token string) bool {
 	})
 
 	return err == nil
+}
+
+func DecodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
+	stringToken := ctx.GetHeader(common.HeaderKey)
+	secrectKey := env.SecretKeyJWT
+	hmacSecret := []byte(secrectKey)
+
+	token, err := jwt.Parse(stringToken, func(t *jwt.Token) (interface{}, error) {
+		return hmacSecret, nil
+	})
+
+	if err != nil {
+		return nil, false
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, true
+	} else {
+		log.Printf("Invalid JWT Token")
+		return nil, false
+	}
 }

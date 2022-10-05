@@ -27,19 +27,22 @@ func NewController(service service.Service) Controller {
 }
 
 func (c *controller) PostUser(ctx *gin.Context) {
-	userRequest := dto.UserRequest{}
-	errBindJSON := ctx.ShouldBindJSON(&userRequest)
-	if errBindJSON != nil {
-		log.Fatal("Failed to bind JSON! - ", errBindJSON)
-	}
+	if c.service.CheckPermission(ctx) {
+		userRequest := dto.UserRequest{}
+		errBindJSON := ctx.ShouldBindJSON(&userRequest)
+		if errBindJSON != nil {
+			log.Fatal("Failed to bind JSON! - ", errBindJSON)
+		}
 
-	err := c.service.UserService(userRequest)
-	if !errors.IsEmptyError(err) {
-		ctx.JSON(http.StatusBadRequest, "Failed to create user!")
-		return
-	}
+		err := c.service.UserService(userRequest)
+		if !errors.IsEmptyError(err) {
+			ctx.JSON(http.StatusBadRequest, "Failed to create user!")
+			return
+		}
 
-	ctx.JSON(http.StatusOK, "User created successfully!")
+		ctx.JSON(http.StatusOK, "User created successfully!")
+	}
+	ctx.JSON(http.StatusBadRequest, "Doesn't have permission to create a new user!")
 }
 
 func (c *controller) Login(ctx *gin.Context) {
@@ -49,13 +52,13 @@ func (c *controller) Login(ctx *gin.Context) {
 		log.Fatal("Failed to bind JSON! - ", errBindJSON)
 	}
 
-	err := c.service.LoginService(loginRequest)
+	user, err := c.service.LoginService(loginRequest)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, "Failed to login!")
 		return
 	}
 
-	token, errorToken := c.service.CreateJWT(&loginRequest)
+	token, errorToken := c.service.CreateJWT(user)
 	if errorToken != nil {
 		ctx.JSON(http.StatusInternalServerError, errorToken)
 	}
