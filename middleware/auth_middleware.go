@@ -69,7 +69,7 @@ func isValidSignatureToken(token string) bool {
 func isExpiredToken(ctx *gin.Context) bool {
 	token, _ := decodedToken(ctx)
 
-	exp := token["exp"].(int)
+	exp := token[common.KeyExpToken].(int)
 	return int64(exp) < time.Now().Unix()
 }
 

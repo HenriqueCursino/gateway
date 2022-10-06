@@ -5,6 +5,7 @@ const (
 	CheckTableEmpty = 1
 	HeaderKey       = "authorized"
 	KeyHashToken    = "userHash"
+	KeyExpToken     = "exp"
 )
 
 const (
