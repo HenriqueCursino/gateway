@@ -7,7 +7,6 @@ const (
 	KeyHashToken    = "userHash"
 )
 
-// permissions
 const (
-	UserCreate = "user_create"
+	PermissionUserCreate = "user_create"
 )

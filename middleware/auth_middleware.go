@@ -4,23 +4,45 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/common/env"
+	"github.com/henriquecursino/gateway/repository"
+	"github.com/henriquecursino/gateway/tools"
 )
+
+type Middleware interface {
+	CheckPermission(ctx *gin.Context) bool
+}
+
+type middleware struct {
+	repo repository.Repository
+}
+
+func NewMiddleware(repo repository.Repository) Middleware {
+	return &middleware{
+		repo,
+	}
+}
 
 func Validate() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if !hasTokenOnHeaders(context) {
-			context.AbortWithStatus(http.StatusUnauthorized)
+			context.JSON(http.StatusUnauthorized, "Token is not in header!")
 			return
 		}
 
 		token := context.Request.Header.Get(common.HeaderKey)
-		if !isValidToken(token) {
-			context.AbortWithStatus(http.StatusUnauthorized)
+		if !isValidSignatureToken(token) {
+			context.JSON(http.StatusUnauthorized, "Token invalid signature!")
+			return
+		}
+
+		if !isExpiredToken(context) {
+			context.JSON(http.StatusUnauthorized, "Token expired!")
 			return
 		}
 
@@ -33,7 +55,7 @@ func hasTokenOnHeaders(ctx *gin.Context) bool {
 	return token != ""
 }
 
-func isValidToken(token string) bool {
+func isValidSignatureToken(token string) bool {
 	_, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, isValid := t.Method.(*jwt.SigningMethodHMAC); !isValid {
 			return nil, fmt.Errorf("invalid token %v", token)
@@ -44,7 +66,14 @@ func isValidToken(token string) bool {
 	return err == nil
 }
 
-func DecodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
+func isExpiredToken(ctx *gin.Context) bool {
+	token, _ := decodedToken(ctx)
+
+	exp := token["exp"].(int)
+	return int64(exp) < time.Now().Unix()
+}
+
+func decodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
 	stringToken := ctx.GetHeader(common.HeaderKey)
 	secrectKey := env.SecretKeyJWT
 	hmacSecret := []byte(secrectKey)
@@ -63,4 +92,28 @@ func DecodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
 		log.Printf("Invalid JWT Token")
 		return nil, false
 	}
+}
+
+func (serv *middleware) CheckPermission(ctx *gin.Context) bool {
+	hash := GetHashFromToken(ctx)
+	userObj, _ := serv.repo.GetUser(hash)
+	permissions, _ := serv.repo.GetAllPermissionsRole(userObj.RoleId)
+	for i := 0; i < len(permissions); i++ {
+		valid, _ := serv.repo.CheckPermission(permissions[i].ID, common.PermissionUserCreate)
+		return valid
+	}
+	return false
+}
+
+func GetHashFromToken(ctx *gin.Context) string {
+	claims, findBody := decodedToken(ctx)
+	if !findBody {
+		ctx.JSON(http.StatusBadGateway, "jwt not found!")
+		return ""
+	}
+
+	hashInterface := claims[common.KeyHashToken]
+	hashString := tools.GetStringFromBody(hashInterface)
+
+	return hashString
 }

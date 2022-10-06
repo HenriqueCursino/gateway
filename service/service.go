@@ -1,16 +1,12 @@
 package service
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
-	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/common/env"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
-	"github.com/henriquecursino/gateway/middleware"
 	"github.com/henriquecursino/gateway/repository"
 	"github.com/henriquecursino/gateway/tools"
 )
@@ -19,7 +15,6 @@ type Service interface {
 	UserService(dto.UserRequest) error
 	LoginService(loginRequest dto.UserLogin) (*model.Users, error)
 	CreateJWT(user *model.Users) (string, error)
-	CheckPermission(ctx *gin.Context) bool
 }
 
 type service struct {
@@ -82,28 +77,4 @@ func (serv *service) CreateJWT(user *model.Users) (string, error) {
 	}
 
 	return tokenString, nil
-}
-
-func (serv *service) CheckPermission(ctx *gin.Context) bool {
-	hash := getHashFromToken(ctx)
-	userObj, _ := serv.repo.GetUser(hash)
-	permissions, _ := serv.repo.GetAllPermissionsRole(userObj.RoleId)
-	for i := 0; i < len(permissions); i++ {
-		valid, _ := serv.repo.CheckPermission(permissions[i].ID, common.UserCreate)
-		return valid
-	}
-	return false
-}
-
-func getHashFromToken(ctx *gin.Context) string {
-	claims, findBody := middleware.DecodedToken(ctx)
-	if !findBody {
-		ctx.JSON(http.StatusBadGateway, "jwt not found!")
-		return ""
-	}
-
-	hashInterface := claims[common.KeyHashToken]
-	hashString := tools.GetStringFromBody(hashInterface)
-
-	return hashString
 }
