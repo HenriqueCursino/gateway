@@ -12,6 +12,8 @@ type Repository interface {
 	GetUser(hash string) (model.Users, error)
 	GetAllPermissionsRole(roleId int) ([]model.PermissionsRoles, error)
 	CheckPermission(permissionId int, namePermission string) (bool, error)
+	GetAllUsers() ([]model.Users, error)
+	GetRole(roleId int) (model.Roles, error)
 }
 
 type repository struct {
@@ -37,7 +39,7 @@ func (repo *repository) LoginUser(login dto.UserLogin) (model.Users, error) {
 
 func (repo *repository) GetUser(hash string) (model.Users, error) {
 	user := model.Users{}
-	err := repo.db.Table(model.TableUserName).Where("hash = ?", hash).First(&user).Error
+	err := repo.db.Table(model.TableUserName).Where("user_id = ?", hash).First(&user).Error
 	return user, err
 }
 
@@ -51,4 +53,16 @@ func (repo *repository) CheckPermission(permissionId int, namePermission string)
 	permissionsRole := model.Permissions{}
 	err := repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissionsRole).Error
 	return permissionsRole.Permission == namePermission, err
+}
+
+func (repo *repository) GetAllUsers() ([]model.Users, error) {
+	allUsers := []model.Users{}
+	err := repo.db.Table(model.TableUserName).Find(&allUsers).Error
+	return allUsers, err
+}
+
+func (repo *repository) GetRole(roleId int) (model.Roles, error) {
+	role := model.Roles{}
+	err := repo.db.Table(model.TableRolesName).Where("id = ?", roleId).First(&role).Error
+	return role, err
 }

@@ -28,6 +28,7 @@ func Router() {
 	controller := controller.NewController(serv, middle)
 
 	router.POST("/users", middleware.Validate(), controller.PostUser)
+	router.GET("/users", middleware.Validate(), controller.GetAllUsers)
 	router.POST("/login", controller.Login)
 
 	router.Run(os.Getenv("SERVER_PORT"))

@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/henriquecursino/gateway/database/model"
+
 type UserRequest struct {
 	FullName string `json:"full_name" binding:"required"`
 	Email    string `json:"email" binding:"required"`
@@ -25,4 +27,13 @@ type UserLogin struct {
 type UserToken struct {
 	Email  string
 	UserId string
+}
+
+type AllUsers struct {
+	FullName string
+	UserId   string
+	Email    string
+	Document string
+	Password string
+	Roles    model.Roles
 }

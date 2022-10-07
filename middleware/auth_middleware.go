@@ -15,7 +15,7 @@ import (
 )
 
 type Middleware interface {
-	CheckPermission(ctx *gin.Context) bool
+	CheckPermission(ctx *gin.Context, permissionName string) bool
 }
 
 type middleware struct {
@@ -69,8 +69,9 @@ func isValidSignatureToken(token string) bool {
 func isExpiredToken(ctx *gin.Context) bool {
 	token, _ := decodedToken(ctx)
 
-	exp := token[common.KeyExpToken].(int)
-	return int64(exp) < time.Now().Unix()
+	exp := token[common.KeyExpToken].(float64)
+	test := int64(exp) > time.Now().Unix()
+	return test
 }
 
 func decodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
@@ -94,15 +95,18 @@ func decodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
 	}
 }
 
-func (serv *middleware) CheckPermission(ctx *gin.Context) bool {
+func (serv *middleware) CheckPermission(ctx *gin.Context, permissionName string) bool {
 	hash := GetHashFromToken(ctx)
 	userObj, _ := serv.repo.GetUser(hash)
 	permissions, _ := serv.repo.GetAllPermissionsRole(userObj.RoleId)
+	var valid bool
 	for i := 0; i < len(permissions); i++ {
-		valid, _ := serv.repo.CheckPermission(permissions[i].ID, common.PermissionUserCreate)
-		return valid
+		valid, _ = serv.repo.CheckPermission(permissions[i].ID, permissionName)
+		if valid {
+			return valid
+		}
 	}
-	return false
+	return valid
 }
 
 func GetHashFromToken(ctx *gin.Context) string {
