@@ -10,7 +10,7 @@ type UserRequest struct {
 
 type UserCreate struct {
 	FullName string
-	Hash     string
+	UserId   string
 	Email    string
 	Document string
 	Password string
@@ -23,6 +23,6 @@ type UserLogin struct {
 }
 
 type UserToken struct {
-	Email string
-	Hash  string
+	Email  string
+	UserId string
 }

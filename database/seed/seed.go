@@ -62,7 +62,7 @@ func Run(db *gorm.DB) {
 	users := []model.Users{
 		{
 			FullName: "Henrique Cursino",
-			Hash:     tools.GenerateHash(),
+			UserId:   tools.GenerateHash(),
 			Email:    "henrique@gmail.com",
 			Document: "12345678910",
 			Password: "123",
@@ -71,7 +71,7 @@ func Run(db *gorm.DB) {
 		},
 		{
 			FullName: "Guilherme Sembeneli",
-			Hash:     tools.GenerateHash(),
+			UserId:   tools.GenerateHash(),
 			Email:    "guilherme@gmail.com",
 			Document: "11122233344",
 			Password: "123456",

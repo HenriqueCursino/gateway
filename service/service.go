@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/common/env"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
@@ -32,7 +33,7 @@ func (serv *service) UserService(userRequest dto.UserRequest) error {
 
 	user := dto.UserCreate{
 		FullName: userRequest.FullName,
-		Hash:     tools.GenerateHash(),
+		UserId:   tools.GenerateHash(),
 		Email:    userRequest.Email,
 		Document: documentUnmasked,
 		Password: userRequest.Password,
@@ -64,10 +65,10 @@ func (serv *service) CreateJWT(user *model.Users) (string, error) {
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	oneDay := 1440 // 24 hours
+	oneDay := common.RemaningHoursToExpired
 
 	claims["email"] = user.Email
-	claims["userHash"] = user.Hash
+	claims["userHash"] = user.UserId
 	claims["exp"] = time.Now().Add(time.Minute * time.Duration(oneDay)).Unix() // minutes
 
 	tokenString, err := token.SignedString([]byte(env.SecretKeyJWT))
