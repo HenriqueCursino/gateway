@@ -1,6 +1,14 @@
 package common
 
 const (
-	DEVELOPMENT       = "development"
-	CHECK_TABLE_EMPTY = 1
+	Development                 = "development"
+	CheckTableEmpty             = 1
+	HeaderKey                   = "authorized"
+	KeyHashToken                = "userHash"
+	KeyExpToken                 = "exp"
+	RemaningHoursToExpiredToken = 1440
+)
+
+const (
+	PermissionUserCreate = "user_create"
 )

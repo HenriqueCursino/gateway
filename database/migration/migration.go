@@ -6,9 +6,5 @@ import (
 )
 
 func Run(db *gorm.DB) error {
-	err := db.AutoMigrate(&model.Roles{})
-	err = db.AutoMigrate(&model.Users{})
-	err = db.AutoMigrate(&model.Permissions{})
-	err = db.AutoMigrate(&model.PermissionsRoles{})
-	return err
+	return db.AutoMigrate(&model.Roles{}, &model.Users{}, &model.Permissions{}, &model.PermissionsRoles{})
 }

@@ -4,8 +4,9 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/google/uuid"
+	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/common/env"
+	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
 	"github.com/henriquecursino/gateway/repository"
 	"github.com/henriquecursino/gateway/tools"
@@ -13,8 +14,8 @@ import (
 
 type Service interface {
 	UserService(dto.UserRequest) error
-	LoginService(loginRequest dto.UserLogin) error
-	CreateJWT(user *dto.UserLogin) (string, error)
+	LoginService(loginRequest dto.UserLogin) (*model.Users, error)
+	CreateJWT(user *model.Users) (string, error)
 }
 
 type service struct {
@@ -27,12 +28,12 @@ func NewService(repo repository.Repository) Service {
 	}
 }
 
-func (serv service) UserService(userRequest dto.UserRequest) error {
+func (serv *service) UserService(userRequest dto.UserRequest) error {
 	documentUnmasked := tools.RemoveMask(userRequest.Document)
 
 	user := dto.UserCreate{
 		FullName: userRequest.FullName,
-		Hash:     uuid.New().String(),
+		UserId:   tools.GenerateHash(),
 		Email:    userRequest.Email,
 		Document: documentUnmasked,
 		Password: userRequest.Password,
@@ -43,7 +44,7 @@ func (serv service) UserService(userRequest dto.UserRequest) error {
 	return err
 }
 
-func (serv service) LoginService(loginRequest dto.UserLogin) error {
+func (serv *service) LoginService(loginRequest dto.UserLogin) (*model.Users, error) {
 	login := dto.UserLogin{
 		Email:    loginRequest.Email,
 		Password: loginRequest.Password,
@@ -51,22 +52,23 @@ func (serv service) LoginService(loginRequest dto.UserLogin) error {
 
 	user, err := serv.repo.LoginUser(login)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if user.Password != login.Password {
 		panic("Wrong password!")
 	}
-	return nil
+	return &user, nil
 }
 
-func (serv service) CreateJWT(user *dto.UserLogin) (string, error) {
+func (serv *service) CreateJWT(user *model.Users) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	oneDay := 1440 // 24 hours
+	oneDay := common.RemaningHoursToExpired
 
 	claims["email"] = user.Email
+	claims["userHash"] = user.UserId
 	claims["exp"] = time.Now().Add(time.Minute * time.Duration(oneDay)).Unix() // minutes
 
 	tokenString, err := token.SignedString([]byte(env.SecretKeyJWT))

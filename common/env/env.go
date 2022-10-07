@@ -3,6 +3,8 @@ package env
 import (
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -16,6 +18,11 @@ func Load() {
 }
 
 func GetEnviroment(envName string) string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Failed to load .env")
+	}
+
 	var valueEnv = os.Getenv(envName)
 	if valueEnv == "" {
 		log.Fatal(envName, " is empty!")
