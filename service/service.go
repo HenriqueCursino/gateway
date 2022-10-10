@@ -16,6 +16,7 @@ type Service interface {
 	UserService(dto.UserRequest) error
 	LoginService(loginRequest dto.UserLogin) (*model.Users, error)
 	CreateJWT(user *model.Users) (string, error)
+	GetAllUsersService() ([]dto.AllUsers, error)
 }
 
 type service struct {
@@ -65,7 +66,7 @@ func (serv *service) CreateJWT(user *model.Users) (string, error) {
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	oneDay := common.RemaningHoursToExpired
+	oneDay := common.RemaningHoursToExpiredToken
 
 	claims["email"] = user.Email
 	claims["userHash"] = user.UserId
@@ -78,4 +79,27 @@ func (serv *service) CreateJWT(user *model.Users) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (serv *service) GetAllUsersService() ([]dto.AllUsers, error) {
+	allUsers, err := serv.repo.GetAllUsers()
+	usersReturn := []dto.AllUsers{}
+	for i := 0; i < len(allUsers); i++ {
+		role, _ := serv.repo.GetRole(allUsers[i].RoleId)
+
+		usersReturn = append(usersReturn, dto.AllUsers{
+			FullName: allUsers[i].FullName,
+			UserId:   allUsers[i].UserId,
+			Email:    allUsers[i].Email,
+			Document: allUsers[i].Document,
+			Password: allUsers[i].Password,
+			Roles:    role,
+		})
+	}
+
+	if err != nil {
+		return []dto.AllUsers{}, err
+	}
+
+	return usersReturn, nil
 }

@@ -11,4 +11,7 @@ const (
 
 const (
 	PermissionUserCreate = "user_create"
+	PermissionGetUsers   = "user_read"
+	PermissionUserDelete = "user_delete"
+	PermissionUserUpdate = "user_update"
 )
