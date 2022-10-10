@@ -37,3 +37,7 @@ type AllUsers struct {
 	Password string
 	Roles    model.Roles
 }
+
+type UserDelete struct {
+	UserId string `json:"user_id"`
+}
