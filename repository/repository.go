@@ -14,6 +14,7 @@ type Repository interface {
 	CheckPermission(permissionId int, namePermission string) (bool, error)
 	GetAllUsers() ([]model.Users, error)
 	GetRole(roleId int) (model.Roles, error)
+	UpdateUserRole(document string, newRoleId int) error
 }
 
 type repository struct {
@@ -65,4 +66,12 @@ func (repo *repository) GetRole(roleId int) (model.Roles, error) {
 	role := model.Roles{}
 	err := repo.db.Table(model.TableRolesName).Where("id = ?", roleId).First(&role).Error
 	return role, err
+}
+
+func (repo *repository) UpdateUserRole(document string, newRoleId int) error {
+	err := repo.db.Table(model.TableUserName).
+		Where("document = ?", document).
+		Update("role_id", newRoleId).
+		Error
+	return err
 }

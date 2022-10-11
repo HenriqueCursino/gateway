@@ -16,6 +16,7 @@ type Controller interface {
 	PostUser(c *gin.Context)
 	Login(ctx *gin.Context)
 	GetAllUsers(ctx *gin.Context)
+	UpdateUserRole(ctx *gin.Context)
 }
 
 type controller struct {
@@ -83,4 +84,23 @@ func (c *controller) GetAllUsers(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusBadRequest, "Doesn't have permission to get all users!")
+}
+
+func (c *controller) UpdateUserRole(ctx *gin.Context) {
+	document := ctx.Param("doc")
+	updateUser := dto.UpdateUserRole{
+		Document: document,
+		NewRole:  0,
+	}
+	errBindJSON := ctx.ShouldBindJSON(&updateUser)
+	if errBindJSON != nil {
+		log.Fatal("Failed to bind JSON! - ", errBindJSON)
+	}
+
+	err := c.service.UpdateUserRole(updateUser)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, "Failed to update user role!")
+		return
+	}
+	ctx.JSON(http.StatusOK, "User role successfully updated!")
 }

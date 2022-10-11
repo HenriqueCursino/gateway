@@ -17,6 +17,7 @@ type Service interface {
 	LoginService(loginRequest dto.UserLogin) (*model.Users, error)
 	CreateJWT(user *model.Users) (string, error)
 	GetAllUsersService() ([]dto.AllUsers, error)
+	UpdateUserRole(updateUser dto.UpdateUserRole) error
 }
 
 type service struct {
@@ -102,4 +103,9 @@ func (serv *service) GetAllUsersService() ([]dto.AllUsers, error) {
 	}
 
 	return usersReturn, nil
+}
+
+func (serv *service) UpdateUserRole(updateUser dto.UpdateUserRole) error {
+	err := serv.repo.UpdateUserRole(updateUser.Document, updateUser.NewRole)
+	return err
 }
