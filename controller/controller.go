@@ -90,7 +90,6 @@ func (c *controller) UpdateUserRole(ctx *gin.Context) {
 	document := ctx.Param("doc")
 	updateUser := dto.UpdateUserRole{
 		Document: document,
-		NewRole:  0,
 	}
 	errBindJSON := ctx.ShouldBindJSON(&updateUser)
 	if errBindJSON != nil {
