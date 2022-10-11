@@ -107,12 +107,12 @@ func (serv *middleware) CheckPermission(permissionName string) gin.HandlerFunc {
 		var valid bool
 		for i := 0; i < len(permissions); i++ {
 			valid, _ = serv.repo.CheckPermissionRepository(permissions[i].ID, permissionName)
-			if !valid {
-				ctx.AbortWithStatusJSON(http.StatusUnauthorized, "User doenst have permission!")
+			if valid {
+				ctx.Next()
 				return
 			}
 		}
-		ctx.Next()
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "User doenst have permission!")
 	}
 }
 

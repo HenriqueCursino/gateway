@@ -33,7 +33,7 @@ func NewController(service service.Service, middleware middleware.Middleware) Co
 }
 
 func (c *controller) PostUser(ctx *gin.Context) {
-	userRequest := dto.UserRequest{}
+	var userRequest dto.UserRequest
 	if errBindJSON := ctx.ShouldBindJSON(&userRequest); errBindJSON != nil {
 		log.Fatal("Failed to bind JSON! - ", errBindJSON)
 	}
@@ -47,7 +47,7 @@ func (c *controller) PostUser(ctx *gin.Context) {
 }
 
 func (c *controller) Login(ctx *gin.Context) {
-	loginRequest := dto.UserLogin{}
+	var loginRequest dto.UserLogin
 	errBindJSON := ctx.ShouldBindJSON(&loginRequest)
 	if errBindJSON != nil {
 		log.Fatal("Failed to bind JSON! - ", errBindJSON)
@@ -79,7 +79,7 @@ func (c *controller) GetAllUsers(ctx *gin.Context) {
 }
 
 func (c *controller) DeleteUser(ctx *gin.Context) {
-	deleteRequest := dto.UserDelete{}
+	var deleteRequest dto.UserDelete
 	errBindJSON := ctx.ShouldBindJSON(&deleteRequest)
 	if errBindJSON != nil {
 		log.Fatal("Failed to bind JSON! - ", errBindJSON)

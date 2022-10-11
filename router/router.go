@@ -27,10 +27,10 @@ func Router() {
 	middle := middleware.NewMiddleware(repo)
 	controller := controller.NewController(serv, middle)
 
-	router.POST("/users", middleware.Validate(), controller.PostUser)
-	router.GET("/users", middleware.Validate(), controller.GetAllUsers)
-	router.PUT("/users/:doc", middleware.Validate(), controller.UpdateUserRole)
-	router.DELETE("/user", middleware.Validate(), controller.DeleteUser)
+	router.POST("/users", middleware.Validate(), middle.CheckPermission(common.PermissionUserCreate), controller.PostUser)
+	router.GET("/users", middleware.Validate(), middle.CheckPermission(common.PermissionGetUsers), controller.GetAllUsers)
+	router.PUT("/users/:doc", middleware.Validate(), middle.CheckPermission(common.PermissionUserUpdate), controller.UpdateUserRole)
+	router.DELETE("/users", middleware.Validate(), middle.CheckPermission(common.PermissionUserDelete), controller.DeleteUser)
 	router.POST("/login", controller.Login)
 
 	router.Run(os.Getenv("SERVER_PORT"))

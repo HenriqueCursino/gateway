@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
 	"gorm.io/gorm"
@@ -34,37 +36,37 @@ func (repo *repository) CreateUser(user *dto.UserCreate) error {
 }
 
 func (repo *repository) LoginUser(login dto.UserLogin) (model.Users, error) {
-	user := model.Users{}
+	var user model.Users
 	err := repo.db.Table(model.TableUserName).Where("email = ?", login.Email).First(&user).Error
 	return user, err
 }
 
 func (repo *repository) GetUser(hash string) (model.Users, error) {
-	user := model.Users{}
+	var user model.Users
 	err := repo.db.Table(model.TableUserName).Where("user_id = ?", hash).First(&user).Error
 	return user, err
 }
 
 func (repo *repository) GetAllPermissionsRole(roleId int) ([]model.PermissionsRoles, error) {
-	permissionsRole := []model.PermissionsRoles{}
+	var permissionsRole []model.PermissionsRoles
 	err := repo.db.Table(model.TablePermissionRole).Where("role_id = ?", roleId).Find(&permissionsRole).Error
 	return permissionsRole, err
 }
 
 func (repo *repository) CheckPermissionRepository(permissionId int, namePermission string) (bool, error) {
-	permissionsRole := model.Permissions{}
+	var permissionsRole model.Permissions
 	err := repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissionsRole).Error
 	return permissionsRole.Permission == namePermission, err
 }
 
 func (repo *repository) GetAllUsers() ([]model.Users, error) {
-	allUsers := []model.Users{}
+	var allUsers []model.Users
 	err := repo.db.Table(model.TableUserName).Find(&allUsers).Error
 	return allUsers, err
 }
 
 func (repo *repository) GetRole(roleId int) (model.Roles, error) {
-	role := model.Roles{}
+	var role model.Roles
 	err := repo.db.Table(model.TableRolesName).Where("id = ?", roleId).First(&role).Error
 	return role, err
 }
@@ -79,8 +81,15 @@ func (repo *repository) UpdateUserRole(document string, newRoleId int) error {
 }
 
 func (repo *repository) DeleteUser(userId string) error {
-	userDeleted := model.Users{}
-	err := repo.db.Table(model.TableUserName).Where("user_id = ?", userId).Delete(&userDeleted).Error
+	var userDeleted model.Users
+	query := repo.db.Table(model.TableUserName).Where("user_id = ?", userId).Delete(&userDeleted)
+	if query.Error != nil {
+		return query.Error
+	}
 
-	return err
+	if query.RowsAffected < 1 {
+		return errors.New("dont have user in database")
+	}
+
+	return nil
 }
