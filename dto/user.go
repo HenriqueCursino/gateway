@@ -42,3 +42,7 @@ type UpdateUserRole struct {
 	Document string
 	NewRole  int `json:"new_role_id"`
 }
+
+type UserDelete struct {
+	UserId string `json:"user_id"`
+}

@@ -30,6 +30,7 @@ func Router() {
 	router.POST("/users", middleware.Validate(), controller.PostUser)
 	router.GET("/users", middleware.Validate(), controller.GetAllUsers)
 	router.PUT("/users/:doc", middleware.Validate(), controller.UpdateUserRole)
+	router.DELETE("/user", middleware.Validate(), controller.DeleteUser)
 	router.POST("/login", controller.Login)
 
 	router.Run(os.Getenv("SERVER_PORT"))

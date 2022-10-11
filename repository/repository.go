@@ -11,10 +11,11 @@ type Repository interface {
 	LoginUser(login dto.UserLogin) (model.Users, error)
 	GetUser(hash string) (model.Users, error)
 	GetAllPermissionsRole(roleId int) ([]model.PermissionsRoles, error)
-	CheckPermission(permissionId int, namePermission string) (bool, error)
+	CheckPermissionRepository(permissionId int, namePermission string) (bool, error)
 	GetAllUsers() ([]model.Users, error)
 	GetRole(roleId int) (model.Roles, error)
 	UpdateUserRole(document string, newRoleId int) error
+	DeleteUser(userId string) error
 }
 
 type repository struct {
@@ -50,7 +51,7 @@ func (repo *repository) GetAllPermissionsRole(roleId int) ([]model.PermissionsRo
 	return permissionsRole, err
 }
 
-func (repo *repository) CheckPermission(permissionId int, namePermission string) (bool, error) {
+func (repo *repository) CheckPermissionRepository(permissionId int, namePermission string) (bool, error) {
 	permissionsRole := model.Permissions{}
 	err := repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissionsRole).Error
 	return permissionsRole.Permission == namePermission, err
@@ -73,5 +74,13 @@ func (repo *repository) UpdateUserRole(document string, newRoleId int) error {
 		Where("document = ?", document).
 		Update("role_id", newRoleId).
 		Error
+
+	return err
+}
+
+func (repo *repository) DeleteUser(userId string) error {
+	userDeleted := model.Users{}
+	err := repo.db.Table(model.TableUserName).Where("user_id = ?", userId).Delete(&userDeleted).Error
+
 	return err
 }
