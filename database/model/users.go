@@ -10,7 +10,7 @@ type Users struct {
 	UserId   string `gorm:"unique"`
 	Email    string `gorm:"size:30; unique" `
 	Document string `gorm:"unique" `
-	Password string `gorm:"size:15"`
+	Password string `gorm:"size:256"`
 	RoleId   int
 	Roles    Roles `gorm:"foreignKey:RoleId"`
 }

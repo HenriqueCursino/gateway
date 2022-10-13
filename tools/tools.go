@@ -9,6 +9,7 @@ import (
 	"github.com/henriquecursino/gateway/common/errors"
 	"github.com/henriquecursino/gateway/database/migration"
 	"github.com/henriquecursino/gateway/database/model"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -41,4 +42,20 @@ func tableUsersIsEmpty(db *gorm.DB) bool {
 	err := db.Find(&userModel)
 
 	return err != nil && len(userModel) < common.CheckTableEmpty
+}
+
+func Encrypt(hash string) (*string, error) {
+	byteHash := []byte(hash)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword(byteHash, bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	encryptedHash := string(hashedPassword)
+	return &encryptedHash, nil
+}
+
+func Compare(hash, password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }

@@ -59,13 +59,16 @@ func Run(db *gorm.DB) {
 		},
 	}
 
+	passwordUserOne, _ := tools.Encrypt("123")
+	passwordUserTwo, _ := tools.Encrypt("123456")
+
 	users := []model.Users{
 		{
 			FullName: "Henrique Cursino",
 			UserId:   tools.GenerateHash(),
 			Email:    "henrique@gmail.com",
 			Document: "12345678910",
-			Password: "123",
+			Password: *passwordUserOne,
 			RoleId:   1,
 			Roles:    model.Roles{},
 		},
@@ -74,7 +77,7 @@ func Run(db *gorm.DB) {
 			UserId:   tools.GenerateHash(),
 			Email:    "guilherme@gmail.com",
 			Document: "11122233344",
-			Password: "123456",
+			Password: *passwordUserTwo,
 			RoleId:   2,
 			Roles:    model.Roles{},
 		},
