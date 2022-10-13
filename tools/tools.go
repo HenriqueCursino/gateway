@@ -9,7 +9,6 @@ import (
 	"github.com/henriquecursino/gateway/common/errors"
 	"github.com/henriquecursino/gateway/database/migration"
 	"github.com/henriquecursino/gateway/database/model"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -42,34 +41,4 @@ func tableUsersIsEmpty(db *gorm.DB) bool {
 	err := db.Find(&userModel)
 
 	return err != nil && len(userModel) < common.CheckTableEmpty
-}
-
-// func PasswordEncode(str string) string {
-// 	return base64.StdEncoding.EncodeToString([]byte(str))
-// }
-
-// func PasswordDecode(str string) (string, bool) {
-// 	data, err := base64.StdEncoding.DecodeString(str)
-// 	if err != nil {
-// 		return "", true
-// 	}
-// 	return string(data), false
-// }
-
-var ErrCrypt = errors.Unknown.WithTemplate("not is possible to encrypt your string. err %w")
-
-func Encrypt(hash string) (*string, error) {
-	byteHash := []byte(hash)
-
-	hashedPassword, err := bcrypt.GenerateFromPassword(byteHash, bcrypt.DefaultCost)
-	if err != nil {
-		return nil, ErrCrypt.WithArgs(err)
-	}
-
-	encryptedHash := string(hashedPassword)
-	return &encryptedHash, nil
-}
-
-func Compare(hash, password string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
