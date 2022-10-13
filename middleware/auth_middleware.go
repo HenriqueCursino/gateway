@@ -15,7 +15,7 @@ import (
 )
 
 type Middleware interface {
-	CheckPermission(ctx *gin.Context, permissionName string) bool
+	CheckPermission(permissionName string) gin.HandlerFunc
 }
 
 type middleware struct {
@@ -31,18 +31,18 @@ func NewMiddleware(repo repository.Repository) Middleware {
 func Validate() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if !hasTokenOnHeaders(context) {
-			context.JSON(http.StatusUnauthorized, "Token is not in header!")
+			context.AbortWithStatusJSON(http.StatusUnauthorized, "Token is not in header!")
 			return
 		}
 
 		token := context.Request.Header.Get(common.HeaderKey)
 		if !isValidSignatureToken(token) {
-			context.JSON(http.StatusUnauthorized, "Token invalid signature!")
+			context.AbortWithStatusJSON(http.StatusUnauthorized, "Token invalid signature!")
 			return
 		}
 
 		if !isExpiredToken(context) {
-			context.JSON(http.StatusUnauthorized, "Token expired!")
+			context.AbortWithStatusJSON(http.StatusUnauthorized, "Token expired!")
 			return
 		}
 
@@ -95,24 +95,31 @@ func decodedToken(ctx *gin.Context) (jwt.MapClaims, bool) {
 	}
 }
 
-func (serv *middleware) CheckPermission(ctx *gin.Context, permissionName string) bool {
-	hash := GetHashFromToken(ctx)
-	userObj, _ := serv.repo.GetUser(hash)
-	permissions, _ := serv.repo.GetAllPermissionsRole(userObj.RoleId)
-	var valid bool
-	for i := 0; i < len(permissions); i++ {
-		valid, _ = serv.repo.CheckPermission(permissions[i].ID, permissionName)
-		if valid {
-			return valid
+func (serv *middleware) CheckPermission(permissionName string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		hash := GetHashFromToken(ctx)
+		userObj, _ := serv.repo.GetUser(hash)
+		permissions, _ := serv.repo.GetAllPermissionsRole(userObj.RoleId)
+		if len(permissions) == 0 {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, "User doenst have permission!")
+			return
 		}
+		var valid bool
+		for i := 0; i < len(permissions); i++ {
+			valid, _ = serv.repo.CheckPermissionRepository(permissions[i].ID, permissionName)
+			if valid {
+				ctx.Next()
+				return
+			}
+		}
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "User doenst have permission!")
 	}
-	return valid
 }
 
 func GetHashFromToken(ctx *gin.Context) string {
 	claims, findBody := decodedToken(ctx)
 	if !findBody {
-		ctx.JSON(http.StatusBadGateway, "jwt not found!")
+		ctx.AbortWithStatusJSON(http.StatusBadGateway, "jwt not found!")
 		return ""
 	}
 
