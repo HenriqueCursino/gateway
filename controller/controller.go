@@ -24,7 +24,6 @@ type controller struct {
 	middleware middleware.Middleware
 }
 
-// NewController receive methods about core user
 func NewController(service service.Service, middleware middleware.Middleware) Controller {
 	return &controller{
 		service,
