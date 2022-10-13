@@ -33,13 +33,14 @@ func NewService(repo repository.Repository) Service {
 
 func (serv *service) UserService(userRequest dto.UserRequest) error {
 	documentUnmasked := tools.RemoveMask(userRequest.Document)
+	passwordHash, _ := tools.Encrypt(userRequest.Password)
 
 	user := dto.UserCreate{
 		FullName: userRequest.FullName,
 		UserId:   tools.GenerateHash(),
 		Email:    userRequest.Email,
 		Document: documentUnmasked,
-		Password: userRequest.Password,
+		Password: *passwordHash,
 		RoleId:   userRequest.RoleID,
 	}
 
@@ -48,19 +49,22 @@ func (serv *service) UserService(userRequest dto.UserRequest) error {
 }
 
 func (serv *service) LoginService(loginRequest dto.UserLogin) (*model.Users, error) {
+	passwordHash, _ := tools.Encrypt(loginRequest.Password)
+
 	login := dto.UserLogin{
 		Email:    loginRequest.Email,
-		Password: loginRequest.Password,
+		Password: *passwordHash,
 	}
 
 	user, err := serv.repo.LoginUser(login)
 	if err != nil {
 		return nil, err
 	}
-	if user.Password != login.Password {
-		panic("Wrong password!")
+
+	if tools.Compare(user.Password, loginRequest.Password) {
+		return &user, nil
 	}
-	return &user, nil
+	panic("Wrong password!")
 }
 
 func (serv *service) CreateJWT(user *model.Users) (string, error) {
