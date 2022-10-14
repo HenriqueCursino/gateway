@@ -18,6 +18,7 @@ type Controller interface {
 	UpdateUserRole(ctx *gin.Context)
 	DeleteUser(ctx *gin.Context)
 	PostRole(ctx *gin.Context)
+	GetAllRoles(ctx *gin.Context)
 }
 
 type controller struct {
@@ -123,4 +124,12 @@ func (c *controller) PostRole(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, "User role successfully created!")
+}
+
+func (c *controller) GetAllRoles(ctx *gin.Context) {
+	allRoles, err := c.service.GetAllRoles()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, "Failed to get all roles!")
+	}
+	ctx.JSON(http.StatusOK, allRoles)
 }

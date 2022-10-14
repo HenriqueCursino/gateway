@@ -19,6 +19,8 @@ type Repository interface {
 	UpdateUserRole(document string, newRoleId int) error
 	DeleteUser(userId string) error
 	CreateRole(role dto.RoleUser) error
+	GetAllRoles() []model.Roles
+	GetAllPermissions(roleId int) model.Permissions
 }
 
 type repository struct {
@@ -113,4 +115,16 @@ func (repo *repository) CreateRole(role dto.RoleUser) error {
 		repo.db.Table(model.TablePermissionRole).Create(&addPermission)
 	}
 	return nil
+}
+
+func (repo *repository) GetAllRoles() []model.Roles {
+	var allRoles []model.Roles
+	repo.db.Table(model.TableRolesName).Find(&allRoles)
+	return allRoles
+}
+
+func (repo *repository) GetAllPermissions(permissionId int) model.Permissions {
+	var permissions model.Permissions
+	repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissions)
+	return permissions
 }

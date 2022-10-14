@@ -116,6 +116,10 @@ func Run(db *gorm.DB) {
 			RoleId:       roles[0].ID,
 			PermissionId: permissions[7].ID,
 		},
+		{
+			RoleId:       roles[1].ID,
+			PermissionId: permissions[7].ID,
+		},
 	}
 
 	create(db, &roles)

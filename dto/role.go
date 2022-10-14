@@ -9,3 +9,12 @@ type PermissionRole struct {
 	RoleId       int
 	PermissionId int
 }
+
+type AllRoles struct {
+	Role        string
+	Permissions []Permissions
+}
+
+type Permissions struct {
+	Permission string
+}

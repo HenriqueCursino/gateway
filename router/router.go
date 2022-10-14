@@ -33,6 +33,7 @@ func Router() {
 	router.DELETE("/users", middleware.Validate(), middle.CheckPermission(common.PermissionUserDelete), controller.DeleteUser)
 
 	router.POST("/roles", middleware.Validate(), middle.CheckPermission(common.PermissionRoleCreate), controller.PostRole)
+	router.GET("/roles", middleware.Validate(), middle.CheckPermission(common.PermissionGetRole), controller.GetAllRoles)
 
 	router.POST("/login", controller.Login)
 
