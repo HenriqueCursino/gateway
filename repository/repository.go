@@ -18,6 +18,7 @@ type Repository interface {
 	GetRole(roleId int) (model.Roles, error)
 	UpdateUserRole(document string, newRoleId int) error
 	DeleteUser(userId string) error
+	CreateRole(role dto.RoleUser) error
 }
 
 type repository struct {
@@ -91,5 +92,25 @@ func (repo *repository) DeleteUser(userId string) error {
 		return errors.New("dont have user in database")
 	}
 
+	return nil
+}
+
+func (repo *repository) CreateRole(role dto.RoleUser) error {
+	roleModel := model.Roles{
+		Role: role.Role,
+	}
+	result := repo.db.Table(model.TableRolesName).Create(&roleModel)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	newRole := result.Statement.Model.(*model.Roles)
+	for i := 0; i < len(role.PermissionsId); i++ {
+		addPermission := dto.PermissionRole{
+			RoleId:       newRole.ID,
+			PermissionId: role.PermissionsId[i],
+		}
+		repo.db.Table(model.TablePermissionRole).Create(&addPermission)
+	}
 	return nil
 }

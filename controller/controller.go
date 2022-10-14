@@ -17,6 +17,7 @@ type Controller interface {
 	GetAllUsers(ctx *gin.Context)
 	UpdateUserRole(ctx *gin.Context)
 	DeleteUser(ctx *gin.Context)
+	PostRole(ctx *gin.Context)
 }
 
 type controller struct {
@@ -107,4 +108,19 @@ func (c *controller) UpdateUserRole(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, "User role successfully updated!")
+}
+
+func (c *controller) PostRole(ctx *gin.Context) {
+	var createRole dto.RoleUser
+	errBindJSON := ctx.ShouldBindJSON(&createRole)
+	if errBindJSON != nil {
+		log.Fatal("Failed to bind JSON! - ", errBindJSON)
+	}
+
+	err := c.service.CreateRole(createRole)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, "Failed to createS new role!")
+		return
+	}
+	ctx.JSON(http.StatusOK, "User role successfully created!")
 }

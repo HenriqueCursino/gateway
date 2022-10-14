@@ -19,6 +19,7 @@ type Service interface {
 	GetAllUsersService() ([]dto.AllUsers, error)
 	UpdateUserRole(updateUser dto.UpdateUserRole) error
 	DeleteUserService(user dto.UserDelete) error
+	CreateRole(newRole dto.RoleUser) error
 }
 
 type service struct {
@@ -117,6 +118,13 @@ func (serv *service) UpdateUserRole(updateUser dto.UpdateUserRole) error {
 
 func (serv *service) DeleteUserService(user dto.UserDelete) error {
 	if err := serv.repo.DeleteUser(user.UserId); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (serv *service) CreateRole(newRole dto.RoleUser) error {
+	if err := serv.repo.CreateRole(newRole); err != nil {
 		return err
 	}
 	return nil

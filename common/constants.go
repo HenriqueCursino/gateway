@@ -14,4 +14,9 @@ const (
 	PermissionGetUsers   = "user_read"
 	PermissionUserDelete = "user_delete"
 	PermissionUserUpdate = "user_update"
+
+	PermissionRoleCreate = "role_create"
+	PermissionRoleDelete = "role_delete"
+	PermissionRoleUpdate = "role_update"
+	PermissionGetRole    = "role_read"
 )

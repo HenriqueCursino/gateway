@@ -43,19 +43,19 @@ func Run(db *gorm.DB) {
 		},
 		{
 			ID:         5,
-			Permission: "permission_create",
+			Permission: "role_create",
 		},
 		{
 			ID:         6,
-			Permission: "permission_delete",
+			Permission: "role_delete",
 		},
 		{
 			ID:         7,
-			Permission: "permission_update",
+			Permission: "role_update",
 		},
 		{
 			ID:         8,
-			Permission: "permission_read",
+			Permission: "role_read",
 		},
 	}
 
