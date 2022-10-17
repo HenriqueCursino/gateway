@@ -136,6 +136,9 @@ func (repo *repository) GetAllRoles() []model.Roles {
 
 func (repo *repository) GetAllPermissions(permissionId int) model.Permissions {
 	var permissions model.Permissions
+	if permissionId == 0 {
+		return permissions
+	}
 	repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissions)
 	return permissions
 }
