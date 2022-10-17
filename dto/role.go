@@ -7,7 +7,7 @@ type RoleUser struct {
 
 type PermissionRole struct {
 	RoleId       int
-	PermissionId int
+	PermissionId *int
 }
 
 type AllRoles struct {

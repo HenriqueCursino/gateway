@@ -7,6 +7,7 @@ const (
 	KeyHashToken                = "userHash"
 	KeyExpToken                 = "exp"
 	RemaningHoursToExpiredToken = 1440
+	LenghtZero                  = 0
 )
 
 const (

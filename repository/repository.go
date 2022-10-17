@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 
+	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
 	"gorm.io/gorm"
@@ -106,11 +107,21 @@ func (repo *repository) CreateRole(role dto.RoleUser) error {
 		return result.Error
 	}
 
+	var addPermission dto.PermissionRole
 	newRole := result.Statement.Model.(*model.Roles)
+
+	if len(role.PermissionsId) == common.LenghtZero {
+		addPermission = dto.PermissionRole{
+			RoleId: newRole.ID,
+		}
+		repo.db.Table(model.TablePermissionRole).Create(&addPermission)
+		return nil
+	}
+
 	for i := 0; i < len(role.PermissionsId); i++ {
-		addPermission := dto.PermissionRole{
+		addPermission = dto.PermissionRole{
 			RoleId:       newRole.ID,
-			PermissionId: role.PermissionsId[i],
+			PermissionId: &role.PermissionsId[i],
 		}
 		repo.db.Table(model.TablePermissionRole).Create(&addPermission)
 	}
