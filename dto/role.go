@@ -18,3 +18,7 @@ type AllRoles struct {
 type Permissions struct {
 	Permission string
 }
+
+type RoleDelete struct {
+	RoleId int `json:"role_id"`
+}

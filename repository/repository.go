@@ -22,6 +22,7 @@ type Repository interface {
 	CreateRole(role dto.RoleUser) error
 	GetAllRoles() []model.Roles
 	GetAllPermissions(roleId int) model.Permissions
+	DeleteRole(roleId int) error
 }
 
 type repository struct {
@@ -85,7 +86,7 @@ func (repo *repository) UpdateUserRole(document string, newRoleId int) error {
 }
 
 func (repo *repository) DeleteUser(userId string) error {
-	var userDeleted model.Users
+	var userDeleted []model.Users
 	query := repo.db.Table(model.TableUserName).Where("user_id = ?", userId).Delete(&userDeleted)
 	if query.Error != nil {
 		return query.Error
@@ -141,4 +142,18 @@ func (repo *repository) GetAllPermissions(permissionId int) model.Permissions {
 	}
 	repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissions)
 	return permissions
+}
+
+func (repo *repository) DeleteRole(roleId int) error {
+	var roleDelete model.Roles
+	query := repo.db.Table(model.TableRolesName).Where("id = ?", roleId).Delete(&roleDelete)
+	if query.Error != nil {
+		return query.Error
+	}
+
+	if query.RowsAffected < 1 {
+		return errors.New("dont have this role in database")
+	}
+
+	return nil
 }

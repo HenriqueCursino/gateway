@@ -21,6 +21,7 @@ type Service interface {
 	DeleteUserService(user dto.UserDelete) error
 	CreateRole(newRole dto.RoleUser) error
 	GetAllRoles() ([]dto.AllRoles, error)
+	DeleteRoleService(role dto.RoleDelete) error
 }
 
 type service struct {
@@ -154,4 +155,11 @@ func (serv *service) GetAllRoles() ([]dto.AllRoles, error) {
 		permissions = []dto.Permissions{}
 	}
 	return allRolesResponse, nil
+}
+
+func (serv *service) DeleteRoleService(role dto.RoleDelete) error {
+	if err := serv.repo.DeleteRole(role.RoleId); err != nil {
+		return err
+	}
+	return nil
 }
