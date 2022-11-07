@@ -17,6 +17,9 @@ type Controller interface {
 	GetAllUsers(ctx *gin.Context)
 	UpdateUserRole(ctx *gin.Context)
 	DeleteUser(ctx *gin.Context)
+	PostRole(ctx *gin.Context)
+	GetAllRoles(ctx *gin.Context)
+	DeleteRole(ctx *gin.Context)
 }
 
 type controller struct {
@@ -85,7 +88,7 @@ func (c *controller) DeleteUser(ctx *gin.Context) {
 	}
 	err := c.service.DeleteUserService(deleteRequest)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, "Failed to get all users")
+		ctx.JSON(http.StatusBadRequest, "Failed to delete user")
 		return
 	}
 	ctx.JSON(http.StatusOK, "User deleted successfully!")
@@ -107,4 +110,41 @@ func (c *controller) UpdateUserRole(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, "User role successfully updated!")
+}
+
+func (c *controller) PostRole(ctx *gin.Context) {
+	var createRole dto.RoleUser
+	errBindJSON := ctx.ShouldBindJSON(&createRole)
+	if errBindJSON != nil {
+		log.Fatal("Failed to bind JSON! - ", errBindJSON)
+	}
+
+	err := c.service.CreateRole(createRole)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, "Failed to create new role!")
+		return
+	}
+	ctx.JSON(http.StatusOK, "User role successfully created!")
+}
+
+func (c *controller) GetAllRoles(ctx *gin.Context) {
+	allRoles, err := c.service.GetAllRoles()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, "Failed to get all roles!")
+	}
+	ctx.JSON(http.StatusOK, allRoles)
+}
+
+func (c *controller) DeleteRole(ctx *gin.Context) {
+	var deleteRequest dto.RoleDelete
+	errBindJSON := ctx.ShouldBindJSON(&deleteRequest)
+	if errBindJSON != nil {
+		log.Fatal("Failed to bind JSON! - ", errBindJSON)
+	}
+	err := c.service.DeleteRoleService(deleteRequest)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, "Failed to delete this role")
+		return
+	}
+	ctx.JSON(http.StatusOK, "Role deleted successfully!")
 }

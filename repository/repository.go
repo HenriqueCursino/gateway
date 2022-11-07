@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 
+	"github.com/henriquecursino/gateway/common"
 	"github.com/henriquecursino/gateway/database/model"
 	"github.com/henriquecursino/gateway/dto"
 	"gorm.io/gorm"
@@ -18,6 +19,10 @@ type Repository interface {
 	GetRole(roleId int) (model.Roles, error)
 	UpdateUserRole(document string, newRoleId int) error
 	DeleteUser(userId string) error
+	CreateRole(role dto.RoleUser) error
+	GetAllRoles() []model.Roles
+	GetAllPermissions(roleId int) model.Permissions
+	DeleteRole(roleId int) error
 }
 
 type repository struct {
@@ -81,7 +86,7 @@ func (repo *repository) UpdateUserRole(document string, newRoleId int) error {
 }
 
 func (repo *repository) DeleteUser(userId string) error {
-	var userDeleted model.Users
+	var userDeleted []model.Users
 	query := repo.db.Table(model.TableUserName).Where("user_id = ?", userId).Delete(&userDeleted)
 	if query.Error != nil {
 		return query.Error
@@ -89,6 +94,65 @@ func (repo *repository) DeleteUser(userId string) error {
 
 	if query.RowsAffected < 1 {
 		return errors.New("dont have user in database")
+	}
+
+	return nil
+}
+
+func (repo *repository) CreateRole(role dto.RoleUser) error {
+	roleModel := model.Roles{
+		Role: role.Role,
+	}
+	result := repo.db.Table(model.TableRolesName).Create(&roleModel)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	var addPermission dto.PermissionRole
+	newRole := result.Statement.Model.(*model.Roles)
+
+	if len(role.PermissionsId) == common.LenghtZero {
+		addPermission = dto.PermissionRole{
+			RoleId: newRole.ID,
+		}
+		repo.db.Table(model.TablePermissionRole).Create(&addPermission)
+		return nil
+	}
+
+	for i := 0; i < len(role.PermissionsId); i++ {
+		addPermission = dto.PermissionRole{
+			RoleId:       newRole.ID,
+			PermissionId: &role.PermissionsId[i],
+		}
+		repo.db.Table(model.TablePermissionRole).Create(&addPermission)
+	}
+	return nil
+}
+
+func (repo *repository) GetAllRoles() []model.Roles {
+	var allRoles []model.Roles
+	repo.db.Table(model.TableRolesName).Find(&allRoles)
+	return allRoles
+}
+
+func (repo *repository) GetAllPermissions(permissionId int) model.Permissions {
+	var permissions model.Permissions
+	if permissionId == 0 {
+		return permissions
+	}
+	repo.db.Table(model.TablePermission).Where("id = ?", permissionId).First(&permissions)
+	return permissions
+}
+
+func (repo *repository) DeleteRole(roleId int) error {
+	var roleDelete model.Roles
+	query := repo.db.Table(model.TableRolesName).Where("id = ?", roleId).Delete(&roleDelete)
+	if query.Error != nil {
+		return query.Error
+	}
+
+	if query.RowsAffected < 1 {
+		return errors.New("dont have this role in database")
 	}
 
 	return nil

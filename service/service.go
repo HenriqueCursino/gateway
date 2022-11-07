@@ -19,6 +19,9 @@ type Service interface {
 	GetAllUsersService() ([]dto.AllUsers, error)
 	UpdateUserRole(updateUser dto.UpdateUserRole) error
 	DeleteUserService(user dto.UserDelete) error
+	CreateRole(newRole dto.RoleUser) error
+	GetAllRoles() ([]dto.AllRoles, error)
+	DeleteRoleService(role dto.RoleDelete) error
 }
 
 type service struct {
@@ -117,6 +120,45 @@ func (serv *service) UpdateUserRole(updateUser dto.UpdateUserRole) error {
 
 func (serv *service) DeleteUserService(user dto.UserDelete) error {
 	if err := serv.repo.DeleteUser(user.UserId); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (serv *service) CreateRole(newRole dto.RoleUser) error {
+	if err := serv.repo.CreateRole(newRole); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (serv *service) GetAllRoles() ([]dto.AllRoles, error) {
+	allRoles := serv.repo.GetAllRoles()
+	allRolesResponse := []dto.AllRoles{}
+	permissions := []dto.Permissions{}
+
+	for i := 0; i < len(allRoles); i++ {
+		allPermRole, err := serv.repo.GetAllPermissionsRole(allRoles[i].ID)
+		if err != nil {
+			return allRolesResponse, err
+		}
+		for index := 0; index < len(allPermRole); index++ {
+			allPerm := serv.repo.GetAllPermissions(allPermRole[index].PermissionId)
+			permissions = append(permissions, dto.Permissions{
+				Permission: allPerm.Permission,
+			})
+		}
+		allRolesResponse = append(allRolesResponse, dto.AllRoles{
+			Role:        allRoles[i].Role,
+			Permissions: permissions,
+		})
+		permissions = []dto.Permissions{}
+	}
+	return allRolesResponse, nil
+}
+
+func (serv *service) DeleteRoleService(role dto.RoleDelete) error {
+	if err := serv.repo.DeleteRole(role.RoleId); err != nil {
 		return err
 	}
 	return nil
